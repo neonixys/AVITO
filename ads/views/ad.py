@@ -1,68 +1,57 @@
 import json
 
-from django.core.paginator import Paginator
 from django.db import IntegrityError
 from django.http import JsonResponse, HttpResponseBadRequest
 from django.shortcuts import get_object_or_404
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
-from django.views.generic import DetailView, ListView, UpdateView, DeleteView, CreateView
+from django.views.generic import UpdateView, DeleteView, CreateView
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.viewsets import ModelViewSet
 
-from Avito_DZ28 import settings
 from ads.models import Ad, Category
+from ads.serializers import AdSerializer, AdDetailSerializer, AdListSerializer
 from users.models import User
 
 
-class AdListView(ListView):
-    model = Ad
-
-    def get(self, request, *args, **kwargs):
-        super().get(request, *args, **kwargs)
-
-        self.object_list = self.object_list.select_related("author").prefetch_related("author").order_by("-price")
-
-        paginator = Paginator(self.object_list, settings.TOTAL_ON_PAGE)
-        page_number = request.GET.get("page")
-        page_obj = paginator.get_page(page_number)
-
-        ads = []
-        for ad in page_obj:
-            ads.append({
-                "id": ad.id,
-                "name": ad.name,
-                "author": ad.author.username,
-                "price": ad.price,
-                "description": ad.description,
-                "is_published": ad.is_published,
-                "category": ad.category.name,
-                "image": ad.image.url})
-
-        response = {
-            "total": page_obj.paginator.count,
-            "num_pages": page_obj.paginator.num_pages,
-            "items": ads
-        }
-
-        return JsonResponse(response, safe=False, json_dumps_params={'ensure_ascii': False})
+class AdPagination(PageNumberPagination):
+    page_size = 5
 
 
-class AdDetailView(DetailView):
-    model = Ad
+class AdViewSet(ModelViewSet):
+    queryset = Ad.objects.order_by("-price")
+    default_serializer = AdSerializer
+    serializer_class = {
+        'retrieve': AdDetailSerializer,
+        'list': AdListSerializer
+    }
+    pagination_class = AdPagination
 
-    def get(self, requests, *args, **kwargs):
-        ad = self.get_object()
+    def get_serializer_class(self):
+        return self.serializer_class.get(self.action, self.default_serializer)
 
-        return JsonResponse({
-            "id": ad.id,
-            "name": ad.name,
-            "author": f"{ad.author.first_name} {ad.author.last_name}",
-            "price": ad.price,
-            "description": ad.description,
-            "address": ad.address,
-            "is_published": ad.is_published,
-            "category": ad.category.name,
-            "image": ad.image.url
-        }, safe=False, json_dumps_params={'ensure_ascii': False})
+    def list(self, request, *args, **kwargs):
+        categories = request.GET.getlist("cat")
+        if categories:
+            self.queryset = self.queryset.filter(category_id__in=categories)
+
+        text = request.GET.get("text")
+        if text:
+            self.queryset = self.queryset.filter(name__icontains=text)
+
+        location = request.GET.get("location")
+        if location:
+            self.queryset = self.queryset.filter(author__location__name__icontains=location)
+
+        price_from = request.GET.get("price_from")
+        price_to = request.GET.get("price_to")
+
+        if price_from:
+            self.queryset = self.queryset.filter(price__gte=price_from)
+        if price_to:
+            self.queryset = self.queryset.filter(price__lte=price_to)
+
+        return super().list(request, *args, **kwargs)
 
 
 @method_decorator(csrf_exempt, name='dispatch')

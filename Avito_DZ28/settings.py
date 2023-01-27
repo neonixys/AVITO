@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
     'ads',
     'users',
 ]
@@ -127,3 +128,12 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'images')
 
 TOTAL_ON_PAGE = 5
+
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 4,
+    # 'DEFAULT_AUTHENTICATION_CLASSES': [
+    #     "rest_framework.authentication.TokenAuthentication",
+    #     'rest_framework_simplejwt.authentication.JWTAuthentication',
+    # ]
+}
