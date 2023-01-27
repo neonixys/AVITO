@@ -5,8 +5,11 @@ from rest_framework.viewsets import ModelViewSet
 
 from users.serializers import *
 
+
 class UserPagination(PageNumberPagination):
     page_size = 6
+
+
 class LocationViewSet(ModelViewSet):
     serializer_class = LocationSerializer
     queryset = Location.objects.all()
