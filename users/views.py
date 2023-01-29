@@ -1,6 +1,7 @@
 from django.db.models import Count, Q
 from rest_framework.generics import RetrieveAPIView, ListAPIView, DestroyAPIView, CreateAPIView, UpdateAPIView
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.permissions import AllowAny
 from rest_framework.viewsets import ModelViewSet
 
 from users.serializers import *
@@ -26,6 +27,7 @@ class UserListView(ListAPIView):
 class UserDetailView(RetrieveAPIView):
     serializer_class = UserSerializer
     queryset = User.objects.all()
+    permission_classes = [AllowAny]
 
 
 class UserCreateView(CreateAPIView):
