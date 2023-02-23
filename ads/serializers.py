@@ -1,10 +1,10 @@
-
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework.serializers import ModelSerializer
 
 from ads import models
 from ads.models import Ad, Category, Selection
+from ads.validators import not_null
 from users.models import User, UserRoles
 from users.serializers import UserSerializer, UserLocationSerializer
 
@@ -16,6 +16,13 @@ class CategorySerializer(ModelSerializer):
 
 
 class AdSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Ad
+        fields = '__all__'
+
+
+class AdCreateSerializer(serializers.ModelSerializer):
+    is_published = serializers.BooleanField(validators=[not_null], default=False)
     class Meta:
         model = Ad
         fields = '__all__'

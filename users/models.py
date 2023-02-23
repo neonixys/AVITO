@@ -1,6 +1,9 @@
 from django.contrib.auth.models import AbstractUser
+from django.core.validators import RegexValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+
+from users.validators import date_of_birth_validator
 
 
 class Location(models.Model):
@@ -26,6 +29,19 @@ class User(AbstractUser):
     role = models.CharField(choices=UserRoles.choices, default=UserRoles.MEMBER, max_length=9)
     age = models.SmallIntegerField(null=True)
     location = models.ManyToManyField(Location)
+    birth_date = models.DateField(
+        validators=[date_of_birth_validator], blank=True, null=True
+    )
+    email = models.EmailField(
+        unique=True,
+        validators=[
+            RegexValidator(
+                regex="@rambler.ru",
+                inverse_match=True,
+                message="Domain rambler.ru is prohibit",
+            )
+        ],
+    )
 
     def save(self, *args, **kwargs):
         self.set_password(self.password)
