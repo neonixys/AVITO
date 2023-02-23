@@ -9,9 +9,7 @@ class UserFactory(factory.django.DjangoModelFactory):
         model = User
 
     username = factory.Faker("name")
-    # password = factory.Faker("password")
-    # age = 37
-    # birth_date = "1985-02-24"
+    password = factory.Faker("password")
     email = factory.Faker("email")
 
 
