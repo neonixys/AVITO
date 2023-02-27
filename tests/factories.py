@@ -9,7 +9,7 @@ class UserFactory(factory.django.DjangoModelFactory):
         model = User
 
     username = factory.Faker("name")
-    password = factory.Faker("password")
+    # password = factory.Faker("password")
     email = factory.Faker("email")
 
 
@@ -28,4 +28,4 @@ class AdFactory(factory.django.DjangoModelFactory):
     name = factory.Faker("name")
     category = factory.SubFactory(CategoryFactory)
     author = factory.SubFactory(UserFactory)
-    price = factory.Faker("ean", length=8)
+    price = 1000

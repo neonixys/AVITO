@@ -22,7 +22,7 @@ class AdSerializer(serializers.ModelSerializer):
 
 
 class AdCreateSerializer(serializers.ModelSerializer):
-    is_published = serializers.BooleanField(validators=[not_null], default=False)
+    is_published = serializers.BooleanField(validators=[not_null], default=False )
     class Meta:
         model = Ad
         fields = '__all__'

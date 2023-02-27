@@ -4,10 +4,10 @@ from users.models import UserRoles
 
 
 class IsSelectionOwner(BasePermission):
-    message = "Вы не имеете право изменять эту подборку"
+    message = 'Вы не имеете права изменять эту подборку'
 
     def has_object_permission(self, request, view, selection):
-        if request.user.role == selection.author:
+        if request.user == selection.owner:
             return True
         return False
 

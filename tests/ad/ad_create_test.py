@@ -16,13 +16,13 @@ def test_create_ad(client, user, category, user_token):
             "is_published": False,
             "name": "Super car(used)",
             "price": 1000000,
-
+            "description": None,
             "address": "Vidone city",
-
+            "image": None,
             "author": user.pk,
             "category": category.pk
         }
-    response = client.post("/ad/", data, HTTP_AUTHORIZATION="Bearer " + user_token)
+    response = client.post("/ad/", data, HTTP_AUTHORIZATION=f"Bearer {user_token}")
 
     assert response.status_code == 201
     assert response.data == expected_data
